@@ -28,6 +28,6 @@ Different settings can be adjusted here, please see the file for further informa
 
 ### Data:
 
-The above script will use images from the "./data" folder. Only RGB images in format .png and .jpg of a minimum size of 227x227 pixels will be considered. If the image is larger, it will be cut off at the sides.
+The above script will use images from the "./data" folder. Only RGB images in format .png and .jpg of a minimum size of 227x227 pixels will be considered. If the image is larger, it will be cut off at the sides. Note that there should be enough images in this folder, since the samplers need them (see paper for further information).
 
 The "./data" folder also contains a text file with the ImageNet class labels.
