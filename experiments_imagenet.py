@@ -83,7 +83,11 @@ classnames = utlD.get_imagenet_classnames()
 
 if not test_indices:
     test_indices = [i for i in range(X_test.shape[0])]      
-          
+
+# make folder for saving the results if it doesn't exist
+path_results = './results/'
+if not os.path.exists(path_results):
+    os.makedirs(path_results)          
           
 # ------------------------ EXPERIMENTS ------------------------
 
@@ -106,9 +110,9 @@ for test_idx in test_indices:
                            
     # get the path for saving the results
     if sampl_style == 'conditional':
-        save_path = './results/{}_{}_winSize{}_condSampl_numSampl{}_paddSize{}_{}'.format(X_filenames[test_idx],y_pred_label,win_size,num_samples,padding_size,netname)
+        save_path = path_results+'{}_{}_winSize{}_condSampl_numSampl{}_paddSize{}_{}'.format(X_filenames[test_idx],y_pred_label,win_size,num_samples,padding_size,netname)
     elif sampl_style == 'marginal':
-        save_path = './results/{}_{}_winSize{}_margSampl_numSampl{}_{}'.format(X_filenames[test_idx],y_pred_label,win_size,num_samples,netname)
+        save_path = path_results+'{}_{}_winSize{}_margSampl_numSampl{}_{}'.format(X_filenames[test_idx],y_pred_label,win_size,num_samples,netname)
 
     if os.path.exists(save_path+'.npz'):
         print 'Results for ', X_filenames[test_idx], ' exist, will move to the next image. '
