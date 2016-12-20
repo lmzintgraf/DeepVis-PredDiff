@@ -75,6 +75,10 @@ class cond_sampler_imagenet:
         self.image_dims = image_dims
         self.netname = netname
         self.num_samples_fit = num_samples_fit
+
+        self.path_folder = './gaussians/'
+        if not os.path.exists(self.path_folder):
+            os.makedirs(self.path_folder)      
         
         # the whole patch size whose pixel distribution we model with a gaussian
         self.patchSize = win_size+2*self.padding_size
@@ -82,9 +86,9 @@ class cond_sampler_imagenet:
         self.meanVects, self.covMats = self._get_gauss_params()
         
         # the min/max values for the features seen in the data, so that we can cut off overfloating values
-        if not os.path.exists('./gaussians/{}_minMaxVals.npy'.format(netname)):
+        if not os.path.exists(self.path_folder+'{}_minMaxVals.npy'.format(netname)):
             save_minmax_values(self.netname)
-        self.minMaxVals = np.load('./gaussians/{}_minMaxVals.npy'.format(netname))
+        self.minMaxVals = np.load(self.path_folder+'{}_minMaxVals.npy'.format(netname))
         
         self.location = None
         self.dotProdForMean = None
@@ -99,8 +103,8 @@ class cond_sampler_imagenet:
         means = np.zeros((3, self.patchSize*self.patchSize))
         covs = np.zeros((3, self.patchSize*self.patchSize, self.patchSize*self.patchSize)) 
 
-        path_mean = './gaussians/{}_means{}_indep'.format(self.netname, self.patchSize)
-        path_cov = './gaussians/{}_covs{}_indep'.format(self.netname, self.patchSize)
+        path_mean = self.path_folder+'{}_means{}_indep'.format(self.netname, self.patchSize)
+        path_cov = self.path_folder+'{}_covs{}_indep'.format(self.netname, self.patchSize)
         
         # check if  values are already precomputed and saved; otherwise do so first
         if os.path.exists(path_mean+'.npy') and os.path.exists(path_cov+'.npy'):
@@ -156,7 +160,7 @@ class cond_sampler_imagenet:
         mu1 = np.take(self.meanVects[channel], inPatchIdx)
         mu2 = np.delete(self.meanVects[channel], inPatchIdx)       
         
-        path_dotProdForMean = './gaussians/{}_cov{}_win{}_dotProdForMean_{}_{}'.format(self.netname, self.patchSize, self.win_size, inPatchIdx[0], inPatchIdx[-1])     
+        path_dotProdForMean = self.path_folder+'{}_cov{}_win{}_dotProdForMean_{}_{}'.format(self.netname, self.patchSize, self.win_size, inPatchIdx[0], inPatchIdx[-1])     
         
         # get the dot product for the mean (check if precomputed, otherwise do this first)
         if not os.path.exists(path_dotProdForMean+'.npy'):
@@ -173,7 +177,7 @@ class cond_sampler_imagenet:
         # with the dotproduct, we can now evaluate the conditional mean
         cond_mean = mu1 + np.dot(dotProdForMean, x2-mu2)
         
-        path_condCov = './gaussians/{}_cov{}_win{}_cond_cov_{}_{}_indep'.format(self.netname, self.patchSize, self.win_size, inPatchIdx[0], inPatchIdx[-1])
+        path_condCov = self.path_folder+'{}_cov{}_win{}_cond_cov_{}_{}_indep'.format(self.netname, self.patchSize, self.win_size, inPatchIdx[0], inPatchIdx[-1])
         
         # get the conditional covariance
         if not os.path.exists(path_condCov+'.npy'):        
@@ -327,7 +331,10 @@ def save_minmax_values(netname):
     minMaxVals = np.zeros((2,3,X.shape[-1],X.shape[-1]))
     minMaxVals[0] = np.min(X,axis=0)
     minMaxVals[1] = np.max(X,axis=0)
-    np.save('./gaussians/{}_minMaxVals'.format(netname), minMaxVals)
+    path_folder = './gaussians/'
+    if not os.path.exists(path_folder):
+        os.makedirs(path_folder)
+    np.save(path_folder+'{}_minMaxVals'.format(netname), minMaxVals)
    
    
     
