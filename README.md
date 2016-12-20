@@ -8,7 +8,8 @@ which is currently under review at ICLR2017, see
 
 https://openreview.net/forum?id=BJ5UeU9xx
 
-Note that we are only publishing the code for the ImageNet experiments, since we cannot publish the MRI scans. If you are interested in the MRI implementation, please contact me (lmzintgraf@gmail.com).
+Note that we are only publishing the code for the ImageNet experiments, since we cannot publish the MRI scans. 
+If you are interested in the MRI implementation, please contact me (lmzintgraf@gmail.com).
 
 ## ImageNet Experiments
 
@@ -22,10 +23,11 @@ You will also need to download the respective caffemodel files (they're quite la
 
 ### Running Experiments:
 
-The experiments can be run by executing "./IMAGENET Experiments/experiments_imagenet.py". Different settings can be adjusted here, please see the file for further information.
+The experiments can be run by executing "./IMAGENET Experiments/experiments_imagenet.py". 
+Different settings can be adjusted here, please see the file for further information.
 
 ### Data:
 
-The above script will use images from the "./data" folder. Only RGB images in format .png and .jpg of a minimum size of 227x227 pixels will be considered. If the image is larger, it will automatically be cropped (keeping the upper left part).
+The above script will use images from the "./data" folder. Only RGB images in format .png and .jpg of a minimum size of 227x227 pixels will be considered. If the image is larger, it will be cut off at the sides.
 
 The "./data" folder also contains a text file with the ImageNet class labels.
