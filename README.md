@@ -4,7 +4,7 @@ This code implements the method from the paper
 
 "Visualizing Deep Neural Network Decisions: Prediction Difference Analysis" - Luisa M Zintgraf, Taco S Cohen, Tameem Adel, Max Welling
 
-which is currently under review at ICLR2017, see
+which was accepted at ICLR2017, see
 
 https://openreview.net/forum?id=BJ5UeU9xx
 
