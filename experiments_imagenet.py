@@ -10,26 +10,20 @@ to True, otherwise the calculation will take a very long time.
 @author: Luisa M Zintgraf
 """
 
-# the following is needed to avoid some error that can be thrown when 
-# using matplotlib.pyplot in a linux shell
-import matplotlib 
-matplotlib.use('Agg')   
-
-# standard imports
-import numpy as np
-import time
-import os
-
-# most important script - relevance estimator
 from prediction_difference_analysis import PredDiffAnalyser
-
-# utilities
 import utils_classifiers as utlC
 import utils_data as utlD
 import utils_sampling as utlS
 import utils_visualise as utlV
 import sensitivity_analysis_caffe as SA
 
+import numpy as np
+import time
+import os
+import matplotlib
+# the following is needed to avoid some error that can be thrown when
+# using matplotlib.pyplot in a linux shell
+matplotlib.use('Agg')
 
 # ------------------------ CONFIGURATION ------------------------
 # -------------------> CHANGE SETTINGS HERE <--------------------
@@ -40,12 +34,12 @@ netname = 'googlenet'
 # pick for which layers the explanations should be computet
 # (names depend on network, output layer is usually called 'prob')
 blobnames = ['prob']
-#blobnames = ['conv1','conv2','conv3','conv4','conv5','fc6','fc7','fc8','prob'] # alexnet
-#blobnames = ['conv1/7x7_s2', 'conv2/3x3_reduce', 'conv2/3x3', 'conv2/norm2', 'inception_3a/output', 'inception_3b/output', 'inception_4a/output', 'inception_4b/output', 'inception_4c/output', 'inception_4d/output', 'inception_4e/output','inception_5a/output', 'inception_5b/output', 'loss3/classifier', 'prob']
-#blobnames = ['conv1_1', 'conv1_2', 'conv2_1', 'conv2_2', 'conv3_1', 'conv3_2', 'conv3_3', 'conv4_1', 'conv4_2', 'conv4_3', 'conv5_1', 'conv5_2', 'conv5_3', 'fc6', 'fc7', 'fc8', 'prob'] # vgg
+# blobnames = ['conv1','conv2','conv3','conv4','conv5','fc6','fc7','fc8','prob'] # alexnet
+# blobnames = ['conv1/7x7_s2', 'conv2/3x3_reduce', 'conv2/3x3', 'conv2/norm2', 'inception_3a/output', 'inception_3b/output', 'inception_4a/output', 'inception_4b/output', 'inception_4c/output', 'inception_4d/output', 'inception_4e/output','inception_5a/output', 'inception_5b/output', 'loss3/classifier', 'prob']
+# blobnames = ['conv1_1', 'conv1_2', 'conv2_1', 'conv2_2', 'conv3_1', 'conv3_2', 'conv3_3', 'conv4_1', 'conv4_2', 'conv4_3', 'conv5_1', 'conv5_2', 'conv5_3', 'fc6', 'fc7', 'fc8', 'prob'] # vgg
 
 # is caffe running in gpu mode?
-gpu = True
+gpu = False
 
 # pick image indices which are analysed (in alphabetical order as in the ./data folder) [0,1,2,...]
 # (if None, all images in './data' will be analysed)
@@ -55,10 +49,10 @@ test_indices = None
 win_size = 10               # k in alg 1 (see paper)
 
 # indicate whether windows should be overlapping or not
-overlapping = True
+overlapping = False
 
 # settings for sampling 
-sampl_style = 'conditional' # choose: conditional / marginal
+sampl_style = 'conditional'  # choose: conditional / marginal
 num_samples = 10
 padding_size = 2            # important for conditional sampling,
                             # l = win_size+2*padding_size in alg 1
@@ -115,21 +109,21 @@ for test_idx in test_indices:
         save_path = path_results+'{}_{}_winSize{}_margSampl_numSampl{}_{}'.format(X_filenames[test_idx],y_pred_label,win_size,num_samples,netname)
 
     if os.path.exists(save_path+'.npz'):
-        print 'Results for ', X_filenames[test_idx], ' exist, will move to the next image. '
+        print('Results for ', X_filenames[test_idx], ' exist, will move to the next image. ')
         continue
                  
-    print "doing test...", "file :", X_filenames[test_idx], ", net:", netname, ", win_size:", win_size, ", sampling: ", sampl_style
+    print("doing test...", "file :", X_filenames[test_idx], ", net:", netname, ", win_size:", win_size, ", sampling: ", sampl_style)
 
     # compute the sensitivity map
     layer_name = net.blobs.keys()[-2] # look at penultimate layer (like in Simonyan et al. (2013))
-    sensMap = SA.get_sens_map(net, x_test[np.newaxis], layer_name, np.argmax(target_func(x_test)[-1][0]))                 
+    sensMap = SA.get_sensitivity_map(net, x_test[np.newaxis], layer_name, np.argmax(target_func(x_test)[-1][0]))
 
     start_time = time.time()
     
     if sampl_style == 'conditional':
-        sampler = utlS.cond_sampler_imagenet(win_size=win_size, padding_size=padding_size, image_dims=net.crop_dims, netname=netname)
+        sampler = utlS.ConditionalSamplerImagenet(win_size=win_size, padding_size=padding_size, image_dims=net.crop_dims, netname=netname)
     elif sampl_style == 'marginal':
-        sampler = utlS.marg_sampler_imagenet(X_test, net)
+        sampler = utlS.MarginalSamplerImagenet(X_test, net)
         
     pda = PredDiffAnalyser(x_test, target_func, sampler, num_samples=num_samples, batch_size=batch_size)
     pred_diff = pda.get_rel_vect(win_size=win_size, overlap=overlapping)
@@ -137,9 +131,4 @@ for test_idx in test_indices:
     # plot and save the results
     utlV.plot_results(x_test, x_test_im, sensMap, pred_diff[0], target_func, classnames, test_idx, save_path)
     np.savez(save_path, *pred_diff)
-    print "--- Total computation took {:.4f} minutes ---".format((time.time() - start_time)/60)
-    
-        
-
-
-        
+    print("--- Total computation took {:.4f} minutes ---".format((time.time() - start_time)/60))

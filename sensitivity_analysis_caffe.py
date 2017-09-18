@@ -14,7 +14,8 @@ https://github.com/yosinski/deep-visualization-toolbox
 
 import numpy as np
 
-def get_sens_map(net, x_test, backprop_layer, backprop_unit):
+
+def get_sensitivity_map(net, x_test, backprop_layer, backprop_unit):
     """a
     Given a caffe network, an image and a backpropagation layer and
     unit, this returns a sensitivity map which, loosely speaking, 
@@ -29,7 +30,7 @@ def get_sens_map(net, x_test, backprop_layer, backprop_unit):
     # set the diffs of the backprop_layer to 0
     diffs = net.blobs[backprop_layer].diff * 0
     # set the target unit to its initial value
-    diffs[0][backprop_unit] = net.blobs[backprop_layer].data[0,backprop_unit]
+    diffs[0][backprop_unit] = net.blobs[backprop_layer].data[0, backprop_unit]
     # save diffs in the network
     net.blobs[backprop_layer].diff[...] = diffs
     
@@ -41,11 +42,9 @@ def get_sens_map(net, x_test, backprop_layer, backprop_unit):
             past_start = True
     
     # get the sensitivity map
-    sMap = net.backward(start=backprop_layer)['data'][0]
+    sensitivity_map = net.backward(start=backprop_layer)['data'][0]
     
     # take the maximum from each color channel (from the absolute values)
-    sMap = np.max(np.abs(sMap),axis=0)
+    sensitivity_map = np.max(np.abs(sensitivity_map), axis=0)
     
-    return np.copy(sMap)
-        
- 
+    return np.copy(sensitivity_map)

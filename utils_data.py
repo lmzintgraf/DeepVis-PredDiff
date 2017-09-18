@@ -45,9 +45,9 @@ def get_imagenet_data(net):
         if np_img.shape[0] >= img_dim[0] and np_img.shape[1] >= img_dim[1]:
             o = 0.5*np.array([np_img.shape[0]-img_dim[0], np_img.shape[1]-img_dim[1]])
             X = np.vstack((X, np_img[o[0]:o[0]+img_dim[0], o[1]:o[1]+img_dim[1], :][np.newaxis]))
-            X_filenames.append(img_list[i].replace(".",""))
+            X_filenames.append(img_list[i].replace(".", ""))
         else:
-            print("Skipped ",img_list[i],", image dimensions were too small.")
+            print("Skipped ", img_list[i], ", image dimensions were too small.")
 
     # the number of images we found in the folder
     num_imgs = X.shape[0]
