@@ -43,7 +43,7 @@ def get_imagenet_data(net):
     for i in range(len(img_list)):
         np_img = np.float32(PIL.Image.open('{}/{}'.format(path_data, img_list[i])))
         if np_img.shape[0] >= img_dim[0] and np_img.shape[1] >= img_dim[1]:
-            o = 0.5*np.array([np_img.shape[0]-img_dim[0], np_img.shape[1]-img_dim[1]])
+            o = int(0.5*np.array([np_img.shape[0]-img_dim[0], np_img.shape[1]-img_dim[1]]))
             X = np.vstack((X, np_img[o[0]:o[0]+img_dim[0], o[1]:o[1]+img_dim[1], :][np.newaxis]))
             X_filenames.append(img_list[i].replace(".",""))
         else:
